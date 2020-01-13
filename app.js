@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const uuid = require('uuid/v4');
+const file_store = require('session-file-store')(session);
 
 const app = express();
 
@@ -9,6 +10,7 @@ app.use(session({
 	console.log('in genid with id: ' + req.sessionID);
 	return uuid();
     },
+    store: new file_store(),
     secret: 'some secret',
     resave: false,
     saveUninitialized: true
