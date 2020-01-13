@@ -18,8 +18,8 @@ app.use(session({
 
 app.get('/', function(req, res) {
     res.send('Home page with id: ' + req.sessionID);
-})
+});
 
 app.listen(3000, function() {
     console.log('Listening on localhost:3000')
-})
+});
