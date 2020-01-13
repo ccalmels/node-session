@@ -1,9 +1,11 @@
 const express = require('express');
+const uuid = require('uuid/v4');
 
 const app = express();
 
 app.get('/', function(req, res) {
-    res.send('Home page');
+    const unique_id = uuid();
+    res.send('Home page with id: ' + unique_id);
 })
 
 app.listen(3000, function() {
