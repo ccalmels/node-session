@@ -1,11 +1,21 @@
 const express = require('express');
+const session = require('express-session');
 const uuid = require('uuid/v4');
 
 const app = express();
 
+app.use(session({
+    genid: function(req) {
+	console.log('in genid with id: ' + req.sessionID);
+	return uuid();
+    },
+    secret: 'some secret',
+    resave: false,
+    saveUninitialized: true
+}));
+
 app.get('/', function(req, res) {
-    const unique_id = uuid();
-    res.send('Home page with id: ' + unique_id);
+    res.send('Home page with id: ' + req.sessionID);
 })
 
 app.listen(3000, function() {
