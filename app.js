@@ -27,6 +27,12 @@ passport.serializeUser(function(user, done) {
     done(null, user.id);
 });
 
+passport.deserializeUser(function(id, done) {
+    console.log('in deserializeUser id: ' + id);
+    const user = users[0].id === id ? users[0]: false;
+    done(null, user);
+});
+
 const app = express();
 
 app.use(body_parser.urlencoded({ extended: false }));
@@ -72,6 +78,16 @@ app.post('/login', function(req, res, next) {
 	    return res.send('you are authenticated');
 	})
     })(req, res, next);
+});
+
+app.get('/authorized', function(req, res) {
+    console.log('get /authorized: ' + req.isAuthenticated());
+
+    if (req.isAuthenticated()) {
+	res.send('it is ok Mr. ' + req.user.email);
+    } else {
+	res.redirect('/');
+    }
 });
 
 app.listen(3000, function() {
