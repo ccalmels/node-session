@@ -99,6 +99,13 @@ app.get('/authorized', function(req, res) {
     }
 });
 
+app.get('/logout', function(req, res) {
+    console.log('get /logout: ' + JSON.stringify(req.user));
+
+    req.logout();
+    res.redirect('/');
+});
+
 app.listen(3000, function() {
     console.log('Listening on localhost:3000')
 });
