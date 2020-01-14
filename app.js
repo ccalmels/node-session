@@ -20,6 +20,8 @@ passport.use(new passport_local(
 	    console.log('local strategy returns true');
 	    return done(null, user);
 	}
+
+	return done(null, false, { message: 'Invalid credentials.\n' });
     }));
 
 passport.serializeUser(function(user, done) {
@@ -70,11 +72,18 @@ app.post('/login', function(req, res, next) {
 		    + JSON.stringify(req.session.user)
 		    + ' with '
 		    + JSON.stringify(req.session.passport));
+
+	if (info) return res.send(info.message);
+	if (err) return next(err);
+	if (!user) return res.redirect('/login');
+
 	req.login(user, function(err) {
 	    console.log('in login for '
 			+ JSON.stringify(req.user)
 			+ ' with '
 			+ JSON.stringify(req.session.passport));
+	    if (err) return next(err);
+
 	    return res.send('you are authenticated');
 	})
     })(req, res, next);
