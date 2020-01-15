@@ -37,6 +37,7 @@ passport.deserializeUser(function(id, done) {
 
 const app = express();
 
+app.use(express.static('public'));
 app.use(body_parser.urlencoded({ extended: false }));
 app.use(body_parser.json());
 
@@ -53,16 +54,6 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.get('/', function(req, res) {
-    res.send('Home page with id: ' + req.sessionID);
-});
-
-// login routes
-app.get('/login', function(req, res) {
-    console.log('/login function ' + req.sessionID);
-    res.send(`This is the login page!`);
-});
 
 app.post('/login', function(req, res, next) {
     console.log('/login post');
@@ -84,7 +75,8 @@ app.post('/login', function(req, res, next) {
 			+ JSON.stringify(req.session.passport));
 	    if (err) return next(err);
 
-	    return res.send('you are authenticated');
+	    console.log(req.user.id + ' is authenticated');
+	    res.redirect('/authorized');
 	})
     })(req, res, next);
 });
