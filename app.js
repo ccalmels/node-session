@@ -81,14 +81,18 @@ app.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
-app.get('/authorized', function(req, res) {
-    console.log('get /authorized: ' + req.isAuthenticated());
-
+app.all('/*', function(req, res, next) {
     if (req.isAuthenticated()) {
-	res.send('it is ok Mr. ' + req.user.email);
+	next();
     } else {
 	res.redirect('/');
     }
+});
+
+app.get('/authorized', function(req, res) {
+    console.log('get /authorized: ' + req.isAuthenticated());
+
+    res.send('it is ok Mr. ' + req.user.email);
 });
 
 app.get('/logout', function(req, res) {
