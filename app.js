@@ -13,11 +13,8 @@ const users = [
 passport.use(new passport_local(
     { usernameField: 'email' },
     function(email, password, done) {
-	console.log('in local strategy');
-
 	const user = users[0];
 	if (email === user.email && password === user.password) {
-	    console.log('local strategy returns true');
 	    return done(null, user);
 	}
 
@@ -25,12 +22,10 @@ passport.use(new passport_local(
     }));
 
 passport.serializeUser(function(user, done) {
-    console.log('in serializeUser');
     done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-    console.log('in deserializeUser id: ' + id);
     const user = users[0].id === id ? users[0]: false;
     done(null, user);
 });
@@ -43,7 +38,6 @@ app.use(body_parser.json());
 
 app.use(session({
     genid: function(req) {
-	console.log('in genid with id: ' + req.sessionID);
 	return uuid();
     },
     store: new file_store(),
@@ -55,31 +49,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.post('/login', function(req, res, next) {
-    console.log('/login post');
-
-    passport.authenticate('local', function(err, user, info) {
-	console.log('in authenticate for '
-		    + JSON.stringify(req.session.user)
-		    + ' with '
-		    + JSON.stringify(req.session.passport));
-
-	if (info) return res.send(info.message);
-	if (err) return next(err);
-	if (!user) return res.redirect('/login');
-
-	req.login(user, function(err) {
-	    console.log('in login for '
-			+ JSON.stringify(req.user)
-			+ ' with '
-			+ JSON.stringify(req.session.passport));
-	    if (err) return next(err);
-
-	    console.log(req.user.id + ' is authenticated');
-	    res.redirect('/authorized');
-	})
-    })(req, res, next);
-});
+app.post('/login',
+	 passport.authenticate('local',
+			       { successRedirect: '/authorized',
+				 failureRedirect: '/' }));
 
 app.all('/*', function(req, res, next) {
     if (req.isAuthenticated()) {
@@ -90,14 +63,10 @@ app.all('/*', function(req, res, next) {
 });
 
 app.get('/authorized', function(req, res) {
-    console.log('get /authorized: ' + req.isAuthenticated());
-
     res.send('it is ok Mr. ' + req.user.email);
 });
 
 app.get('/logout', function(req, res) {
-    console.log('get /logout: ' + JSON.stringify(req.user));
-
     req.logout();
     res.redirect('/');
 });
