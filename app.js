@@ -32,7 +32,7 @@ passport.deserializeUser(function(id, done) {
 
 const app = express();
 
-app.use(express.static('public'));
+app.set('view engine', 'pug');
 app.use(body_parser.urlencoded({ extended: false }));
 app.use(body_parser.json());
 
@@ -48,6 +48,10 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.get('/', function(req, res) {
+    res.render('index');
+});
 
 app.post('/login',
 	 passport.authenticate('local',
