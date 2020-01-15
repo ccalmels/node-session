@@ -5,6 +5,7 @@ const file_store = require('session-file-store')(session);
 const body_parser = require('body-parser');
 const passport = require('passport');
 const passport_local = require('passport-local').Strategy;
+const flash = require('connect-flash');
 
 const users = [
     { id: '123', email: 'foo@bar.com', password: 'password' }
@@ -18,7 +19,7 @@ passport.use(new passport_local(
 	    return done(null, user);
 	}
 
-	return done(null, false, { message: 'Invalid credentials.\n' });
+	return done(null, false, { message: 'Invalid credentials.' });
     }));
 
 passport.serializeUser(function(user, done) {
@@ -32,6 +33,7 @@ passport.deserializeUser(function(id, done) {
 
 const app = express();
 
+app.use(flash());
 app.set('view engine', 'pug');
 app.use(body_parser.urlencoded({ extended: false }));
 app.use(body_parser.json());
@@ -50,13 +52,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', function(req, res) {
-    res.render('index');
+    res.render('index', { message: req.flash('error') });
 });
 
 app.post('/login',
 	 passport.authenticate('local',
 			       { successRedirect: '/authorized',
-				 failureRedirect: '/' }));
+				 failureRedirect: '/',
+				 failureFlash: true }));
 
 app.all('/*', function(req, res, next) {
     if (req.isAuthenticated()) {
