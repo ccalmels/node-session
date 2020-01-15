@@ -67,7 +67,7 @@ app.all('/*', function(req, res, next) {
 });
 
 app.get('/authorized', function(req, res) {
-    res.send('it is ok Mr. ' + req.user.email);
+    res.render('authorized', { user: req.user.email });
 });
 
 app.get('/logout', function(req, res) {
